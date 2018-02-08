@@ -54,57 +54,66 @@
 
 '''
 
-
-import subprocess
-
-def replace(path):
-
-    step1 = "sed -i 's/render_to_response(/render(request, /g' `grep 'render_to_response' -rl  %s`" % path
-
-    step2 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_response' -rl  %s`" % path
-
-    step3 = "sed -i 's/from django.template import RequestContext,/from django.template import/g' `grep 'render_to_response' -rl  %s`" % path
-
-    step4 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_response' -rl  %s`" % path
-
-    step5 = "sed -i 's/import render_to_response/import render/g' `grep 'render_to_response' -rl  %s`" % path
-
-    step6 = "sed -i 's/render_to_string(/render(request, /g' `grep 'render_to_string' -rl  %s`" % path
-
-    step7 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_string' -rl  %s`" % path
-
-    step8 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_string' -rl  %s`" % path
-
-    step9 = "sed -i 's/from django.template.loader import render_to_string/from django.shortcuts import render/g' `grep 'render_to_string' -rl  %s`" % path
-
-    # step10 = "grep -rn 'context_instance=RequestContext' %s" % path
-
-    # step11 = "grep -rn 'context_instance=context_instance' %s" % path
-
-    # step12 = "grep -rn 'context_instance=context' %s" % path
-
-    step10 = "grep -rn 'context_instance=' %s" % path
-
-    step11 = "grep -rn 'context_instance = RequestContext' %s" % path
+from subprocess import call
 
 
-    steps = []
-    steps.append(step1)
-    steps.append(step2)
-    steps.append(step3)
-    steps.append(step4)
-    steps.append(step5)
-    steps.append(step6)
-    steps.append(step7)
-    steps.append(step8)
-    steps.append(step9)
-    steps.append(step10)
-    steps.append(step11)
+class Replace(object):
+    def origin_replace(path):
+        step1 = "sed -i 's/render_to_response(/render(request, /g' `grep 'render_to_response' -rl  %s`" % path
 
-    for step in steps:
-        subprocess.call([step], shell=True)
+        step2 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_response' -rl  %s`" % path
+
+        step3 = "sed -i 's/from django.template import RequestContext,/from django.template import/g' `grep 'render_to_response' -rl  %s`" % path
+
+        step4 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_response' -rl  %s`" % path
+
+        step5 = "sed -i 's/import render_to_response/import render/g' `grep 'render_to_response' -rl  %s`" % path
+
+        step6 = "sed -i 's/render_to_string(/render(request, /g' `grep 'render_to_string' -rl  %s`" % path
+
+        step7 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_string' -rl  %s`" % path
+
+        step8 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_string' -rl  %s`" % path
+
+        step9 = "sed -i 's/from django.template.loader import render_to_string/from django.shortcuts import render/g' `grep 'render_to_string' -rl  %s`" % path
+
+        # step10 = "grep -rn 'context_instance=RequestContext' %s" % path
+
+        # step11 = "grep -rn 'context_instance=context_instance' %s" % path
+
+        # step12 = "grep -rn 'context_instance=context' %s" % path
+
+        step10 = "grep -rn 'context_instance=' %s" % path
+
+        step11 = "grep -rn 'context_instance = RequestContext' %s" % path
+
+        steps = []
+        steps.append(step1)
+        steps.append(step2)
+        steps.append(step3)
+        steps.append(step4)
+        steps.append(step5)
+        steps.append(step6)
+        steps.append(step7)
+        steps.append(step8)
+        steps.append(step9)
+        steps.append(step10)
+        steps.append(step11)
+
+        for step in steps:
+            call([step], shell=True)
+
+    def add_replace_by_user(old_string, new_string, include_string, path):
+        step = "sed -i 's/%s/%s/g' `grep %s -rl  %s`" % (old_string, new_string, include_string, path)
+        call([step], shell=True)
+
 
 if __name__ == "__main__":
-    print("Please enter path like ./seahub/* or ~/dev/seahub/*")
-    path = raw_input("Please enter path:")
-    replace(path)
+    replace_status = raw_input("Whether to use a custom replacement?(Y or N)")
+    if replace_status == "N":
+        print("Please enter path like ./seahub/* or ~/dev/seahub/*")
+        path = raw_input("Please enter path:")
+        replace = Replace()
+        replace = replace.origin_replace(path)
+    else:
+        pass
