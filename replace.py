@@ -18,7 +18,7 @@
                          WITH    "from django.shortcuts import render"
 
 
-    6. Search for other status(This section needs to be manually modified.)
+    6. Search for other status(This section needs to be manually modified. step10, step11)
 
       e.g.
 
@@ -33,8 +33,12 @@
                                     kwargs,
                                     context_instance=context)
 
+      6.2  ./seahub/seahub/views/file.py:969:
 
-      6.2  ./seahub/seahub/avatar/views.py:131:
+            return render(request, 'share_access_validation.html', d,
+                                   context_instance=RequestContext(request))
+
+      6.3  ./seahub/seahub/avatar/views.py:131:
 
                 return render(request,
                                    'avatar/confirm_delete.html',
@@ -48,32 +52,41 @@
                                                     )
                                   )
 
-      6.3  ./seahub/seahub/views/file.py:969:
-
-            return render(request, 'share_access_validation.html', d,
-                                   context_instance=RequestContext(request))
 '''
 
 import subprocess
 
 
-step1 = "sed -i 's/render_to_response(/render(request, /g' `grep 'render_to_response' -rl  ./seahub/*`"
+print("Please enter path like ./seahub/* ")
+path = raw_input("Please enter path:")
 
-step2 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_response' -rl  ./seahub/*`"
+step1 = "sed -i 's/render_to_response(/render(request, /g' `grep 'render_to_response' -rl  %s`" % path
 
-step3 = "sed -i 's/from django.template import RequestContext,/from django.template import/g' `grep 'render_to_response' -rl  ./seahub/*`"
+step2 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_response' -rl  %s`" % path
 
-step4 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_response' -rl  ./seahub/*`"
+step3 = "sed -i 's/from django.template import RequestContext,/from django.template import/g' `grep 'render_to_response' -rl  %s`" % path
 
-step5 = "sed -i 's/import render_to_response/import render/g' `grep 'render_to_response' -rl  ./seahub/*`"
+step4 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_response' -rl  %s`" % path
 
-step6 = "sed -i 's/render_to_string(/render(request, /g' `grep 'render_to_string' -rl  ./seahub/*`"
+step5 = "sed -i 's/import render_to_response/import render/g' `grep 'render_to_response' -rl  %s`" % path
 
-step7 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_string' -rl  ./seahub/*`"
+step6 = "sed -i 's/render_to_string(/render(request, /g' `grep 'render_to_string' -rl  %s`" % path
 
-step8 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_string' -rl  ./seahub/*`"
+step7 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_string' -rl  %s`" % path
 
-step9 = "sed -i 's/from django.template.loader import render_to_string/from django.shortcuts import render/g' `grep 'render_to_string' -rl  ./seahub/*`"
+step8 = "sed -i 's/from django.template import RequestContext//g' `grep 'render_to_string' -rl  %s`" % path
+
+step9 = "sed -i 's/from django.template.loader import render_to_string/from django.shortcuts import render/g' `grep 'render_to_string' -rl  %s`" % path
+
+# step10 = "grep -rn 'context_instance=RequestContext' %s" % path
+
+# step11 = "grep -rn 'context_instance=context_instance' %s" % path
+
+# step12 = "grep -rn 'context_instance=context' %s" % path
+
+step10 = "grep -rn 'context_instance=' %s" % path
+
+step11 = "grep -rn 'context_instance = RequestContext' %s" % path
 
 
 steps = []
@@ -86,16 +99,9 @@ steps.append(step6)
 steps.append(step7)
 steps.append(step8)
 steps.append(step9)
+steps.append(step10)
+steps.append(step11)
 
 for step in steps:
     subprocess.call([step], shell=True)
-
-
-subprocess.call(["grep -rn 'context_instance=RequestContext' ./seahub/*"], shell=True)
-
-subprocess.call(["grep -rn 'context_instance=context_instance' ./seahub/*"], shell=True)
-
-subprocess.call(["grep -rn 'context_instance = RequestContext' ./seahub/*"], shell=True)
-
-subprocess.call(["grep -rn 'context_instance=' ./seahub/*"], shell=True)
 
