@@ -58,7 +58,10 @@ from subprocess import call
 
 
 class Replace(object):
-    def origin_replace(path):
+    def __init__(self):
+        pass
+
+    def origin_replace(self, path="~/dev/seahub/*"):
         step1 = "sed -i 's/render_to_response(/render(request, /g' `grep 'render_to_response' -rl  %s`" % path
 
         step2 = "sed -i 's/, context_instance=RequestContext(request)//g' `grep 'render_to_response' -rl  %s`" % path
@@ -103,17 +106,20 @@ class Replace(object):
         for step in steps:
             call([step], shell=True)
 
-    def add_replace_by_user(old_string, new_string, include_string, path):
+    def add_replace_by_user(self, old_string, new_string, include_string, path):
         step = "sed -i 's/%s/%s/g' `grep %s -rl  %s`" % (old_string, new_string, include_string, path)
         call([step], shell=True)
+
+    def run(self, replace_status):
+        if replace_status == "Y":
+            print("Please enter path like ~/dev/seahub/*")
+            path = raw_input("Please enter path:")
+            self.origin_replace(path)
+        else:
+            self.origin_replace()
 
 
 if __name__ == "__main__":
     replace_status = raw_input("Whether to use a custom replacement?(Y or N)")
-    if replace_status == "N":
-        print("Please enter path like ./seahub/* or ~/dev/seahub/*")
-        path = raw_input("Please enter path:")
-        replace = Replace()
-        replace = replace.origin_replace(path)
-    else:
-        pass
+    replace = Replace()
+    replace.run(replace_status)
