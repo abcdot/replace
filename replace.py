@@ -110,16 +110,16 @@ class Replace(object):
         step = "sed -i 's/%s/%s/g' `grep %s -rl  %s`" % (old_string, new_string, include_string, path)
         call([step], shell=True)
 
-    def run(self, replace_status):
-        if replace_status == "Y":
+    def run(self):
+        replace_status = raw_input("Whether to use a custom replacement?(yes or no): ")
+        if replace_status == "yes":
             print("Please enter path like ~/dev/seahub/*")
-            path = raw_input("Please enter path:")
+            path = raw_input("Please enter path: ")
             self.origin_replace(path)
         else:
             self.origin_replace()
 
 
 if __name__ == "__main__":
-    replace_status = raw_input("Whether to use a custom replacement?(Y or N)")
     replace = Replace()
-    replace.run(replace_status)
+    replace.run()
